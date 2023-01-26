@@ -151,7 +151,7 @@ def load_configs_model(model_name='darknet', configs=None):
     configs.gpu_idx = 0  # GPU index to use.
     configs.device = torch.device('cpu' if configs.no_cuda else 'cuda:{}'.format(configs.gpu_idx))
 
-    configs.min_iou = 0.7
+    configs.min_iou = 0.65
 
     return configs
 
@@ -263,7 +263,7 @@ def detect_objects(input_bev_maps, model, configs):
             output_post = output_post[0][1]
             detections = []
             for sample in output_post:
-                _, y, x, z, h, w, l, yaw = sample
+                _, x, y, z, h, w, l, yaw = sample
                 detections.append([1,x, y, z, h, w, l, yaw])
 
             #######
@@ -282,7 +282,7 @@ def detect_objects(input_bev_maps, model, configs):
         ## step 2 : loop over all detections
         for detection in detections:
             ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
-            _, x, y, z, h, w, l, yaw = detection
+            _, y, x, z, h, w, l, yaw = detection
             x = x / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             y = (y - configs.bev_width/2.0)  / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
             z = z  + configs.lim_z[0] #* (configs.lim_z[1] - configs.lim_z[0]) + configs.lim_z[0]

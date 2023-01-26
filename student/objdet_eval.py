@@ -37,14 +37,14 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     
      # find best detection for each valid label 
     true_positives = 0 # no. of correctly detected objects
-    labels_number = 0
+    valid_labels_number = 0
     center_devs = []
     ious = []
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
         if valid: # exclude all labels from statistics which are not considered valid
             
-            labels_number += 1
+            valid_labels_number += 1
             # compute intersection over union (iou) and distance between centers
 
             ####### ID_S4_EX1 START #######     
@@ -52,22 +52,11 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             print("student task ID_S4_EX1 ")
 
             ## step 1 : extract the four corners of the current label bounding-box
-            """label_box = np.array([  label.box.center_x - label.box.length/2.0,
-                                    label.box.center_y - label.box.width/2.0,
-                                    label.box.center_x + label.box.length/2.0,
-                                    label.box.center_y + label.box.width/2.0])
-            """
             label_corners = compute_box_corners(label.box.center_x, label.box.center_y, label.box.width, label.box.length, label.box.heading)
             label_shape = Polygon(label_corners)      
             ## step 2 : loop over all detected objects
             for detection in detections:
                 ## step 3 : extract the four corners of the current detection
-                """
-                det_box = np.array([detection[1] - detection[6]/2.0,
-                                    detection[2] - detection[5]/2.0,
-                                    detection[1] + detection[6]/2.0,
-                                    detection[2] + detection[5]/2.0]) 
-                """
                 det_corners = compute_box_corners(detection[1], detection[2], detection[5], detection[6], detection[7])
                 det_shape = Polygon(det_corners)          
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
@@ -76,10 +65,9 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 dist_z = np.sqrt(np.power(label.box.center_z - detection[3],2.0))
                 ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
                 common_area = label_shape.intersection(det_shape).area
-                global_area = label.box.length * label.box.width
-                global_area += detection[5] * detection[6]
-                global_area -= common_area
+                global_area = label_shape.union(det_shape).area
                 iou = common_area/global_area
+
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
                 if ( iou > min_iou):
                     matches_lab_det.append([iou, dist_x, dist_y, dist_z])
@@ -104,17 +92,18 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     all_positives = len(detections)
 
     ## step 2 : compute the number of false negatives
-    false_negatives = labels_number - len(ious)
+    false_negatives = valid_labels_number - true_positives
 
     ## step 3 : compute the number of false positives
     false_positives = all_positives - true_positives
-    
+
+    #print("All_P : " + str(all_positives) + " TP : " + str(true_positives) + " FN : " + str(false_negatives) + " FP : " + str(false_positives))    
     #######
     ####### ID_S4_EX2 END #######     
     
     pos_negs = [all_positives, true_positives, false_negatives, false_positives]
     det_performance = [ious, center_devs, pos_negs]
-    
+
 
     return det_performance
 
