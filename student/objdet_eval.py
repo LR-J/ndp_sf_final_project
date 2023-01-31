@@ -82,7 +82,6 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             ious.append(best_match[0])
             center_devs.append(best_match[1:])
 
-
     ####### ID_S4_EX2 START #######     
     #######
     print("student task ID_S4_EX2")

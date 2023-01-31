@@ -79,7 +79,8 @@ def show_pcl(pcl):
     visualizer.add_geometry(pcd)
     # step 5 : visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
     visualizer.run()
-    #visualizer.capture_screen_image("id_s1_ex2_height_0.png") # uncomment to save the image
+    #visualizer.capture_screen_image("bev.png") # uncomment to save the image
+
     visualizer.destroy_window()
 
     #######
